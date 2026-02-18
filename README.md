@@ -18,7 +18,7 @@ StudentLink is a full-stack link-in-bio platform designed for students. It provi
 | Frontend | React (Vite), Tailwind CSS, Lucide Icons |
 | Backend | FastAPI (Python) |
 | Database and Auth | Supabase (PostgreSQL + Auth) |
-| Deployment | Vercel (frontend), Render (backend) |
+| Deployment | Vercel |
 
 ## Project Structure
 
@@ -39,6 +39,10 @@ link-in-bio/
 │   │   └── auth.py           # JWT auth utilities
 │   ├── main.py               # FastAPI application entry
 │   └── .env                  # Backend environment variables
+├── api/
+│   └── index.py              # Vercel serverless entrypoint for FastAPI
+├── vercel.json               # Vercel routing and build configuration
+├── requirements.txt          # Root Python dependencies for Vercel Python runtime
 └── supabase/
     └── schema.sql            # Database schema and RLS policies
 ```
@@ -101,6 +105,8 @@ npm run dev
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+FRONTEND_URL=https://your-frontend-domain.vercel.app
+CORS_ORIGINS=https://your-frontend-domain.vercel.app
 ```
 
 ### Frontend (`frontend/.env`)
@@ -108,7 +114,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_API_URL=http://localhost:8000/api
+VITE_API_URL=/api
 ```
 
 ## API Endpoints
@@ -138,23 +144,33 @@ The `is_premium` field in the profile model can be used to enable premium featur
 - Additional profile customizations
 - Future add-ons such as analytics and custom domains
 
-## Deployment
+## Deployment (Vercel)
 
-### Frontend (Vercel)
+This repository is configured to deploy both the frontend and backend in a single Vercel project:
+
+- Frontend: static build from `frontend/`
+- Backend API: Python serverless function at `api/index.py`
+- API routing: `/api/*` forwarded to the FastAPI app
+- SPA routing: all non-file routes fallback to `index.html`
+
+### Deploy Steps
 
 1. Push the repository to GitHub.
-2. Import the repository into Vercel.
-3. Configure environment variables.
+2. Import the repository into Vercel as a new project.
+3. Add these environment variables in Vercel Project Settings:
+    - `VITE_SUPABASE_URL`
+    - `VITE_SUPABASE_ANON_KEY`
+    - `SUPABASE_URL`
+    - `SUPABASE_ANON_KEY`
+    - `SUPABASE_SERVICE_ROLE_KEY`
+    - `FRONTEND_URL` (your Vercel frontend domain)
+    - `CORS_ORIGINS` (comma-separated if multiple origins)
 4. Deploy.
 
-### Backend (Render)
+After deployment:
 
-1. Create a new web service in Render.
-2. Connect the GitHub repository.
-3. Build command: `pip install -r requirements.txt`
-4. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. Configure environment variables.
-6. Deploy.
+- Frontend is served at your Vercel domain.
+- FastAPI endpoints are available under `/api/*`.
 
 ## License
 
