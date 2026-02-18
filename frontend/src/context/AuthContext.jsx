@@ -16,11 +16,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     // Get initial session
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
+        if (!isMounted) return;
+
         if (session) {
           setUser(session.user);
           api.setToken(session.access_token);
@@ -28,16 +32,16 @@ export function AuthProvider({ children }) {
           // Try to fetch profile
           try {
             const profileData = await api.getMyProfile();
-            setProfile(profileData);
+            if (isMounted) setProfile(profileData);
           } catch (err) {
             // Profile doesn't exist yet
             console.log('No profile found');
           }
         }
       } catch (error) {
-        console.error('Session error:', error);
+        if (isMounted) console.error('Session error:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -46,6 +50,8 @@ export function AuthProvider({ children }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!isMounted) return;
+
         if (session) {
           setUser(session.user);
           api.setToken(session.access_token);
@@ -54,9 +60,9 @@ export function AuthProvider({ children }) {
           if (event === 'SIGNED_IN') {
             try {
               const profileData = await api.getMyProfile();
-              setProfile(profileData);
+              if (isMounted) setProfile(profileData);
             } catch (err) {
-              setProfile(null);
+              if (isMounted) setProfile(null);
             }
           }
         } else {
@@ -68,7 +74,10 @@ export function AuthProvider({ children }) {
       }
     );
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email, password) => {
