@@ -1,29 +1,26 @@
-# 🎓 StudentLink - Link-in-Bio for Students
+# StudentLink: Link-in-Bio for Students
 
-A professional, monetizable Link-in-Bio platform built for students. Showcase your GitHub, LinkedIn, portfolio, and capstone project all in one beautiful page.
+StudentLink is a full-stack link-in-bio platform designed for students. It provides a single public profile page where users can share academic and professional links, including GitHub, LinkedIn, portfolio, and capstone projects.
 
-![StudentLink](https://via.placeholder.com/800x400?text=StudentLink+Preview)
+## Features
 
-## ✨ Features
+- Authentication with Supabase (email/password and GitHub OAuth)
+- Profile management dashboard for creating and updating personal details
+- Public profile pages with username-based routing
+- Social and portfolio link support
+- Theme support with free and premium options
+- Responsive design for desktop and mobile devices
 
-- **🔐 Authentication**: Secure signup/login via Supabase Auth (Email & GitHub OAuth)
-- **📝 Profile Builder**: Easy-to-use dashboard to manage your profile
-- **🔗 Social Links**: Add GitHub, LinkedIn, and portfolio links
-- **🎯 Capstone Project**: Highlight your best project
-- **🎨 Themes**: Light/Minimal (free) and Midnight/Dark (premium)
-- **⚡ Real-time**: Changes reflect instantly on your public page
-- **📱 Responsive**: Beautiful on all devices
-
-## 🛠️ Tech Stack
+## Technology Stack
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React (Vite) + Tailwind CSS + Lucide Icons |
+| Frontend | React (Vite), Tailwind CSS, Lucide Icons |
 | Backend | FastAPI (Python) |
-| Database & Auth | Supabase (PostgreSQL) |
-| Deployment | Vercel (Frontend) + Render (Backend) |
+| Database and Auth | Supabase (PostgreSQL + Auth) |
+| Deployment | Vercel (frontend), Render (backend) |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 link-in-bio/
@@ -31,79 +28,72 @@ link-in-bio/
 │   ├── src/
 │   │   ├── components/       # Reusable components
 │   │   ├── context/          # Auth context
-│   │   ├── lib/              # Supabase & API clients
-│   │   └── pages/            # Page components
-│   └── .env                  # Environment variables
+│   │   ├── lib/              # Supabase and API clients
+│   │   └── pages/            # Route page components
+│   └── .env                  # Frontend environment variables
 ├── backend/                  # FastAPI backend
 │   ├── app/
 │   │   ├── routes/           # API routes
 │   │   ├── supabase_client.py
 │   │   ├── schemas.py        # Pydantic models
 │   │   └── auth.py           # JWT auth utilities
-│   ├── main.py               # FastAPI app
-│   └── .env                  # Environment variables
+│   ├── main.py               # FastAPI application entry
+│   └── .env                  # Backend environment variables
 └── supabase/
-    └── schema.sql            # Database schema & RLS policies
+    └── schema.sql            # Database schema and RLS policies
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
 - Python 3.9+
-- Supabase account (free tier works great!)
+- A Supabase account
 
-### 1. Supabase Setup
+### 1) Supabase Setup
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to **SQL Editor** and run the schema from `supabase/schema.sql`
-3. Enable **Email Auth** in Authentication > Providers
-4. (Optional) Enable **GitHub OAuth** for social login
+1. Create a Supabase project at [supabase.com](https://supabase.com).
+2. Open SQL Editor and run [supabase/schema.sql](supabase/schema.sql).
+3. Enable Email authentication in Authentication > Providers.
+4. Optional: Enable GitHub OAuth.
 
-### 2. Backend Setup
+### 2) Backend Setup
 
 ```bash
 cd backend
 
-# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Configure environment
 cp .env.example .env
-# Edit .env with your Supabase credentials
+# Set Supabase values in .env
 
-# Run the server
 uvicorn main:app --reload --port 8000
 ```
 
-### 3. Frontend Setup
+### 3) Frontend Setup
 
 ```bash
 cd frontend
 
-# Install dependencies
 npm install
 
-# Configure environment
 cp .env.example .env
-# Edit .env with your Supabase credentials
+# Set frontend values in .env
 
-# Run development server
 npm run dev
 ```
 
-### 4. Access the App
+### 4) Application URLs
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- API docs: http://localhost:8000/docs
 
-## 🔧 Environment Variables
+## Environment Variables
 
 ### Backend (`backend/.env`)
 
@@ -121,69 +111,55 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_API_URL=http://localhost:8000/api
 ```
 
-## 📡 API Endpoints
+## API Endpoints
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/auth/signup` | Register new user | No |
-| POST | `/api/auth/login` | Login user | No |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/signup` | Register a new user | No |
+| POST | `/api/auth/login` | Authenticate user | No |
 | GET | `/api/profile/{username}` | Get public profile | No |
-| GET | `/api/profile/me/current` | Get own profile | Yes |
+| GET | `/api/profile/me/current` | Get current user profile | Yes |
 | POST | `/api/profile/` | Create profile | Yes |
 | PUT | `/api/profile/` | Update profile | Yes |
 | DELETE | `/api/profile/` | Delete profile | Yes |
 
-## 🎨 Themes
+## Security
 
-### Light/Minimal (Free)
-- Clean white background
-- Blue accents
-- Professional look
+- Row Level Security (RLS) policies protect profile data
+- JWT-based authentication through Supabase
+- Users can modify only their own profile records
+- Public profile data is read-only for non-owners
 
-### Midnight/Dark (Premium)
-- Deep dark background
-- Purple/indigo accents
-- Modern aesthetic
+## Monetization
 
-## 🚢 Deployment
+The `is_premium` field in the profile model can be used to enable premium features such as:
+
+- Premium themes
+- Additional profile customizations
+- Future add-ons such as analytics and custom domains
+
+## Deployment
 
 ### Frontend (Vercel)
 
-1. Push to GitHub
-2. Import to Vercel
-3. Set environment variables
-4. Deploy!
+1. Push the repository to GitHub.
+2. Import the repository into Vercel.
+3. Configure environment variables.
+4. Deploy.
 
 ### Backend (Render)
 
-1. Create new Web Service
-2. Connect GitHub repo
-3. Set build command: `pip install -r requirements.txt`
-4. Set start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-5. Add environment variables
-6. Deploy!
+1. Create a new web service in Render.
+2. Connect the GitHub repository.
+3. Build command: `pip install -r requirements.txt`
+4. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+5. Configure environment variables.
+6. Deploy.
 
-## 🔒 Security
+## License
 
-- Row Level Security (RLS) enabled on all tables
-- JWT authentication via Supabase
-- Users can only modify their own profiles
-- Public profiles are read-only for everyone
+This project is licensed under the MIT License.
 
-## 💰 Monetization
+## Contributing
 
-The `is_premium` boolean in the profiles table enables:
-- Premium themes (Midnight/Dark)
-- Future features (analytics, custom domains, etc.)
-
-## 📝 License
-
-MIT License - feel free to use this for learning or commercial purposes!
-
-## 🤝 Contributing
-
-Contributions welcome! Please read the contributing guidelines first.
-
----
-
-Built with ❤️ for students everywhere
+Contributions are welcome. Please open an issue or submit a pull request for proposed improvements.
