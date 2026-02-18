@@ -21,6 +21,13 @@ export function AuthProvider({ children }) {
     // Get initial session
     const getSession = async () => {
       try {
+        // Check if Supabase is properly configured
+        if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+          console.warn('Supabase not configured - running in demo mode');
+          if (isMounted) setLoading(false);
+          return;
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!isMounted) return;
@@ -46,6 +53,14 @@ export function AuthProvider({ children }) {
     };
 
     getSession();
+
+    // Safety timeout - ensure loading finishes even if something hangs
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn('Auth loading timed out');
+        setLoading(false);
+      }
+    }, 5000);
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -76,6 +91,7 @@ export function AuthProvider({ children }) {
 
     return () => {
       isMounted = false;
+      clearTimeout(timeout);
       subscription?.unsubscribe();
     };
   }, []);
@@ -142,7 +158,16 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }
