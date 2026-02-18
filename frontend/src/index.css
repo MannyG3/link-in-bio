@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Custom base styles */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
+
+/* Custom component classes */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-white text-gray-800 font-medium rounded-lg shadow-md hover:shadow-lg border border-gray-200 transition-all duration-200;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-lg p-6;
+  }
+}
+
+/* Minimal theme (default) */
+.theme-minimal {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --accent: #3b82f6;
+}
+
+/* Midnight theme (premium) */
+.theme-midnight {
+  --bg-primary: #0a0a23;
+  --bg-secondary: #1a1a3e;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0e0;
+  --accent: #6366f1;
+}
