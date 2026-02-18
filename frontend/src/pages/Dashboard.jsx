@@ -113,12 +113,32 @@ export default function Dashboard() {
     setSuccess('');
     setSaving(true);
 
+    // Validation
+    if (!formData.username || formData.username.trim() === '') {
+      setError('Username is required');
+      setSaving(false);
+      return;
+    }
+
     try {
       const payload = {
-        ...formData,
-        links: formData.links,
-        capstone_project: formData.capstone_project,
+        username: formData.username.trim(),
+        full_name: formData.full_name?.trim() || null,
+        bio: formData.bio?.trim() || null,
+        links: {
+          github: formData.links.github?.trim() || '',
+          linkedin: formData.links.linkedin?.trim() || '',
+          portfolio: formData.links.portfolio?.trim() || '',
+        },
+        capstone_project: {
+          title: formData.capstone_project.title?.trim() || '',
+          description: formData.capstone_project.description?.trim() || '',
+          url: formData.capstone_project.url?.trim() || '',
+        },
+        theme_id: formData.theme_id || 'minimal',
       };
+
+      console.log('Saving profile:', { isNewProfile, payload });
 
       let result;
       if (isNewProfile) {
@@ -127,12 +147,15 @@ export default function Dashboard() {
         result = await api.updateProfile(payload);
       }
 
+      console.log('Profile saved:', result);
+
       setProfile(result);
       setIsNewProfile(false);
       setSuccess('Profile saved successfully!');
       
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
+      console.error('Save error:', err);
       setError(err.message || 'Failed to save profile');
     } finally {
       setSaving(false);

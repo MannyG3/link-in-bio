@@ -36,14 +36,16 @@ class ApiService {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        throw new Error('Profile not found');
-      }
       throw new Error(error.message);
     }
+    
+    if (!data) {
+      throw new Error('Profile not found');
+    }
+    
     return data;
   }
 
@@ -52,14 +54,16 @@ class ApiService {
       .from('profiles')
       .select('*')
       .eq('username', username)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        throw new Error('Profile not found');
-      }
       throw new Error(error.message);
     }
+    
+    if (!data) {
+      throw new Error('Profile not found');
+    }
+    
     return data;
   }
 
@@ -67,12 +71,16 @@ class ApiService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    // Check if username is taken
-    const { data: existing } = await supabase
+    // Check if username is taken - use maybeSingle to avoid error when not found
+    const { data: existing, error: checkError } = await supabase
       .from('profiles')
       .select('id')
       .eq('username', profileData.username)
-      .single();
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw new Error(checkError.message);
+    }
 
     if (existing) {
       throw new Error('Username already taken');
@@ -114,9 +122,10 @@ class ApiService {
       .update(updateData)
       .eq('id', user.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw new Error(error.message);
+    if (!data) throw new Error('Profile not found - please create one first');
     return data;
   }
 
